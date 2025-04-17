@@ -19,6 +19,7 @@ from django.contrib.auth.views import (
     LoginView, LogoutView, PasswordChangeView, PasswordChangeDoneView)
 from django.urls import path
 import flux.views
+import authenticate.views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -26,7 +27,7 @@ urlpatterns = [
         template_name='authenticate/login.html',
         redirect_authenticated_user=True),
          name='login'),
-    path('logout/', LogoutView.as_view(), name='logout'),
+    path('logout/', authenticate.views.logout_user, name='logout'),
     path('change-password/', PasswordChangeView.as_view(
         template_name='authenticate/password_change_form.html'),
          name='password_change'
