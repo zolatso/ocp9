@@ -4,4 +4,8 @@ from .models import Ticket, Review
 
 @login_required
 def home(request):
-    return render(request, 'flux/home.html')
+    tickets = Ticket.objects.order_by("time_created")
+    context = {"tickets" : tickets}
+    return render(request, 'flux/home.html', context)
+
+

@@ -20,6 +20,8 @@ from django.contrib.auth.views import (
 from django.urls import path
 import flux.views
 import authenticate.views
+from django.conf import settings
+from django.conf.urls.static import static
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -39,3 +41,6 @@ urlpatterns = [
     path('home/', flux.views.home, name='home'),
     path('sign_up/', authenticate.views.sign_up, name='sign_up')
 ]
+
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

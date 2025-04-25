@@ -9,5 +9,17 @@
                 <a class="btn btn-primary" href="" role="button">Créer une critique</a>
             </div>
         </div>
+        {% for ticket in tickets %}
+        <div class="row border">
+            <div class="col">
+                <h2>{{ ticket.title }}</h2>
+                <p>{{ ticket.description}}</p>
+                <p>Ticket created by: {{ ticket.user }}</p>
+            </div>
+            <div class="col">
+                <img src="{{ ticket.image.url }}" class="img-fluid">
+            </div>
+        </div>
+        {% endfor %}
     </div>
 {% endblock content %}
