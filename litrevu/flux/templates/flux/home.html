@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% block content %}
     <div class="container">
-        <div class="row">
+        <div class="row py-3">
             <div class="col text-end">
                 <a class="btn btn-primary" href="" role="button">Demander une critique</a>
             </div>
@@ -10,7 +10,7 @@
             </div>
         </div>
         {% for ticket in tickets %}
-        <div class="row border">
+        <div class="row border my-2 py-2">
             <div class="col">
                 <h2>{{ ticket.title }}</h2>
                 <p>{{ ticket.description}}</p>

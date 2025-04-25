@@ -6,7 +6,6 @@
         <link rel="stylesheet" type="text/css" href="{% static 'styles.css' %}">
     </head>
     <body>
-        <div class="container">
             <nav class="navbar navbar-expand-lg bg-body-tertiary">
                 <div class="container-fluid">
                     <a class="navbar-brand" href="#">LitReview</a>
@@ -16,7 +15,7 @@
                         <a class="nav-link" href="#">Flux</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#">Ajoutez ticket</a>
+                        <a class="nav-link" href="{% url "ticket-create" %}">Ajoutez ticket</a>
                         <li class="nav-item">
                     </li>
                         <a class="nav-link" href="#">Abonnements</a>
@@ -28,11 +27,10 @@
                     </ul>
                 </div>
             </nav>
-        </div>
         {%  if user.is_authenticated %}
-        <div class="container">
+        <div class="p-2">
             <p class="text-end">Vous êtes connecté en tant que {{ user }}. <a href="{% url 'password_change' %}">Changer votre mot de passe</a></p>
-        </div>
+        <div />
         {% endif %}
         <div class="container">
             {% block content %}{% endblock content %}
