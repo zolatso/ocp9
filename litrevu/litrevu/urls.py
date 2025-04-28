@@ -17,13 +17,11 @@ Including another URLconf
 from django.contrib import admin
 from django.contrib.auth.views import (
     LoginView, LogoutView, PasswordChangeView, PasswordChangeDoneView)
-from django.urls import path
-import flux.views
+from django.urls import path, include
+import flux.urls
 import authenticate.views
 from django.conf import settings
 from django.conf.urls.static import static
-
-from flux.views import HomeView, TicketCreateView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -40,9 +38,8 @@ urlpatterns = [
         template_name='authenticate/password_change_done.html'),
          name='password_change_done'
          ),
-    path('home/', HomeView.as_view(), name='home'),
-    path('ticket/create/', TicketCreateView.as_view(), name='ticket-create'),
-    path('sign_up/', authenticate.views.sign_up, name='sign_up')
+    path('sign_up/', authenticate.views.sign_up, name='sign_up'),
+    path("home/", include("flux.urls")),
 ]
 
 if settings.DEBUG:
