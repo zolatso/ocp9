@@ -6,7 +6,7 @@
                 <a class="btn btn-primary" href="{% url "ticket-create" %}" role="button">Demander une critique</a>
             </div>
             <div class="col">
-                <a class="btn btn-primary" href="" role="button">Créer une critique</a>
+                <a class="btn btn-primary" href="{% url "ticket-review-create" %}" role="button">Créer une critique</a>
             </div>
         </div>
         {% for post in posts %}

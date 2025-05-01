@@ -2,8 +2,34 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic import CreateView, DeleteView
 from django.shortcuts import render
+from django.views.generic import ListView, CreateView
+from django.shortcuts import render, redirect
 from .models import Ticket, Review
 from itertools import chain
+from .forms import TicketReviewForm
+
+@login_required
+def ticket_review_create(request):
+    if request.method == "POST":
+        form = TicketReviewForm(request.POST, request.FILES)
+        if form.is_valid():
+            Ticket.objects.create(
+                title = form.cleaned_data['ticket_title'],
+                description = form.cleaned_data['ticket_description'],
+                user = request.user,
+                image = form.cleaned_data['ticket_image']
+            )
+            Review.objects.create(
+                ticket = Ticket.objects.latest(),
+                rating = form.cleaned_data['review_rating'],
+                headline = form.cleaned_data['review_headline'],
+                body = form.cleaned_data['review_body'],
+                user = request.user
+            )
+            return redirect("/home/")
+    else:
+        form = TicketReviewForm()
+        return render(request, "flux/ticket_review_form.html", {"form": form})
 
 @login_required
 def home(request):

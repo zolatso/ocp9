@@ -42,7 +42,7 @@ INSTALLED_APPS = [
     'django_extensions',
     'authenticate',
     'flux',
-    "bootstrap5",
+    'django_bootstrap5'
 ]
 
 MIDDLEWARE = [
