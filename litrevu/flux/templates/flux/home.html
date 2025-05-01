@@ -16,6 +16,7 @@
                     <h2>Ticket: {{ post.title }}</h2>
                     <p>{{ post.description}}</p>
                     <p>Ticket created by: {{ post.user }}</p>
+                    <a class="btn btn-primary" href="{% url "review-create" post.id %}" role="button">Créer une critique pour ce billet</a>
                 </div>
                 <div class="col">
                     {% if post.image %}

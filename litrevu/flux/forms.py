@@ -9,3 +9,6 @@ class TicketReviewForm(forms.Form):
     review_headline = forms.CharField(max_length=128)
     review_body = forms.CharField(max_length=8192)
 
+class FollowUserForm(forms.Form):
+    user_to_follow = forms.CharField(max_length=150)
+

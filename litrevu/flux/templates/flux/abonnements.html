@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+{% load django_bootstrap5 %}
+{% block content %}
+    <div class="container">
+        <div class="row">
+            <div class="col">
+                {% if messages %}
+                    {% for message in messages %}
+                        <p style="color: #FF0000">{{ message }}</p>
+                    {% endfor %}
+                {% endif %}
+                <form method="post" action="{% url 'follow-user' %}">
+                    {% csrf_token %}
+                    {% bootstrap_form form %}
+                    <button type="submit" class="btn btn-primary">Follow user</button>
+                </form>
+            </div>
+            <div class="col">
+                <h3>Followers:</h3>
+                {% for follower in followers %}
+                    <p>
+                        {{ follower.user }} 
+                        <a class="btn btn-primary" href="{% url 'remove-follower' follower.user.id %}" role="button">Remove follower</a>
+                    </p>
+                {% endfor %}
+            </div>
+            <div class="col">
+                <h3>Following:</h3>
+                {% for followed in following %}
+                    <p>
+                        {{ followed.followed_user }}
+                        <a class="btn btn-primary" href="{% url 'unfollow' followed.followed_user.id %}" role="button">Unfollow</a>
+                    </p>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+{% endblock %}

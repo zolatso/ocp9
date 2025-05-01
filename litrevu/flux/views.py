@@ -1,12 +1,121 @@
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.views.generic import CreateView, DeleteView
+from django.contrib import messages
+from django.views.generic import CreateView, DeleteView, UpdateView
 from django.shortcuts import render
-from django.views.generic import ListView, CreateView
 from django.shortcuts import render, redirect
-from .models import Ticket, Review
+from .models import Ticket, Review, UserFollows
+from authenticate.models import User
 from itertools import chain
-from .forms import TicketReviewForm
+from .forms import TicketReviewForm, FollowUserForm
+
+
+@login_required
+def home(request):
+    tickets = Ticket.objects.filter(user__followed_by__user=request.user)
+    reviews = Review.objects.filter(user__followed_by__user=request.user)
+    posts = sorted(
+        chain(tickets, reviews),
+        key=lambda post: post.time_created,
+        reverse=True)
+    context = {"posts" : posts}
+    return render(request, 'flux/home.html', context)
+
+@login_required
+def my_posts(request):
+    tickets = Ticket.objects.filter(user=request.user)
+    reviews = Review.objects.filter(user=request.user)
+    posts = sorted(
+        chain(tickets, reviews),
+        key=lambda post: post.time_created,
+        reverse=True)
+    context = {"posts" : posts}
+    return render(request, 'flux/my_posts.html', context)
+
+@login_required
+def abonnements(request):
+    following = UserFollows.objects.filter(user=request.user).exclude(followed_user=request.user)
+    followed_by = UserFollows.objects.filter(followed_user=request.user).exclude(user=request.user)
+    form = FollowUserForm()
+    context = {"form": form, "following" : following, "followers" : followed_by}
+    return render(request, 'flux/abonnements.html', context)
+
+@login_required
+def remove_follower(request, id):
+    follower = UserFollows.objects.filter(followed_user=request.user).filter(user=id)
+    follower.delete()
+    return redirect('/home/abonnements/')
+
+@login_required
+def unfollow(request, id):
+    user_to_unfollow = UserFollows.objects.filter(followed_user=id).filter(user=request.user)
+    user_to_unfollow.delete()
+    return redirect('/home/abonnements/')
+
+@login_required
+def follow_user(request):
+    if request.method == "POST":
+        form = FollowUserForm(request.POST)
+        if form.is_valid():
+            user = request.user
+            user_to_follow = form.cleaned_data['user_to_follow']
+            if not User.objects.filter(username=user_to_follow).exists():
+                messages.error(request, "Cet utilisateur n'existe pas.")
+                return redirect('abonnements')
+            else:
+                user_id = User.objects.get(username=user_to_follow)
+                UserFollows.objects.create(
+                    user=user,
+                    followed_user=user_id
+                )
+                return redirect('abonnements')
+
+class TicketCreateView(LoginRequiredMixin, CreateView):
+    model = Ticket
+    fields = ['title', 'description', 'image']
+    success_url = '/home/'
+
+    def form_valid(self, form):
+        # Set the user to the currently logged in user
+        form.instance.user = self.request.user
+        return super().form_valid(form)
+    
+    
+class TicketDeleteView(LoginRequiredMixin, DeleteView):
+    model = Ticket
+    success_url = '/home/my_posts/'
+
+
+class TicketUpdateView(LoginRequiredMixin, UpdateView):
+    model = Ticket
+    fields = ['title', 'description', 'image']
+    success_url = '/home/my_posts/'
+    
+
+class ReviewCreateView(LoginRequiredMixin, CreateView):
+    model = Review
+    fields = ['rating', 'headline', 'body']
+    success_url = '/home/'
+    
+    def form_valid(self, form):
+        # Set the user to the currently logged in user
+        form.instance.user = self.request.user
+        # Link it to the ticket provided in the URL
+        ticket_id = self.kwargs['id']
+        form.instance.ticket = Ticket.objects.get(id=ticket_id)
+        return super().form_valid(form)
+
+
+class ReviewDeleteView(LoginRequiredMixin, DeleteView):
+    model = Review
+    success_url = '/home/my_posts/'
+
+
+class ReviewUpdateView(LoginRequiredMixin, UpdateView):
+    model = Review
+    fields = ['rating', 'headline', 'body']
+    success_url = '/home/my_posts/'
+
 
 @login_required
 def ticket_review_create(request):
@@ -30,58 +139,11 @@ def ticket_review_create(request):
     else:
         form = TicketReviewForm()
         return render(request, "flux/ticket_review_form.html", {"form": form})
+    
 
-@login_required
-def home(request):
-    tickets = Ticket.objects.filter(user__followed_by__user=request.user)
-    reviews = Review.objects.filter(user__followed_by__user=request.user)
-    posts = sorted(
-        chain(tickets, reviews),
-        key=lambda post: post.time_created,
-        reverse=True)
-    context = {"posts" : posts}
-    return render(request, 'flux/home.html', context)
-
+    
 # class HomeView(LoginRequiredMixin, ListView):
 #     model = Ticket
 #     ordering = '-time_created'
 #     template_name = 'flux/home.html'
 #     context_object_name = "tickets"
-
-@login_required
-def my_posts(request):
-    tickets = Ticket.objects.filter(user=request.user)
-    reviews = Review.objects.filter(user=request.user)
-    posts = sorted(
-        chain(tickets, reviews),
-        key=lambda post: post.time_created,
-        reverse=True)
-    context = {"posts" : posts}
-    return render(request, 'flux/my_posts.html', context)
-
-class TicketDeleteView(LoginRequiredMixin, DeleteView):
-    model = Ticket
-    success_url = '/home/'
-
-class TicketCreateView(LoginRequiredMixin, CreateView):
-    model = Ticket
-    fields = ['title', 'description', 'image']
-    success_url = '/home/'
-
-    def form_valid(self, form):
-        # Set the user to the currently logged in user
-        form.instance.user = self.request.user
-        return super().form_valid(form)
-    
-class ReviewCreateView(LoginRequiredMixin, CreateView):
-    model = Review
-    fields = ['rating', 'headline', 'body']
-    success_url = '/home/'
-    
-    def form_valid(self, form):
-        # Set the user to the currently logged in user
-        form.instance.user = self.request.user
-        # Link it to the ticket provided in the URL
-        ticket_id = self.kwargs['id']
-        form.instance.ticket = Ticket.objects.get(id=ticket_id)
-        return super().form_valid(form)
