@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+{% block content %}
+    <div class="container">
+        <div class="row py-3">
+            <div class="col text-end">
+                <a class="btn btn-primary" href="{% url "ticket-create" %}" role="button">Demander une critique</a>
+            </div>
+            <div class="col">
+                <a class="btn btn-primary" href="" role="button">Créer une critique</a>
+            </div>
+        </div>
+        {% for post in posts %}
+        <div class="row border my-2 py-2">
+            {% if post.is_ticket %}
+                <div class="col">
+                    <h2>Ticket: {{ post.title }}</h2>
+                    <p>{{ post.description}}</p>
+                    <p>Vous avez écrit ce ticket le: {{ post.time_created }}</p>
+                    
+                </div>
+                <div class="col">
+                    {% if post.image %}
+                        <img src="{{ post.image.url }}" class="img-fluid">
+                    {% endif %}
+                </div>
+            {% elif post.is_review %}
+                <div class="col">
+                    <h2>{{ post.headline }}</h2>
+                    <p>{{ post.rating}}</p>
+                    <p>{{ post.body }}</p>
+                    <p>Vous avez écrit ce commentaire le: {{ post.time_created }}</p>
+                </div>
+            {% endif %}
+        </div>
+        {% endfor %}
+    </div>
+{% endblock content %}

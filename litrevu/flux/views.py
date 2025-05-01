@@ -1,14 +1,14 @@
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.views.generic import ListView, CreateView
+from django.views.generic import CreateView, DeleteView
 from django.shortcuts import render
 from .models import Ticket, Review
 from itertools import chain
 
 @login_required
 def home(request):
-    tickets = Ticket.objects.order_by("-time_created")
-    reviews = Review.objects.order_by("-time_created")
+    tickets = Ticket.objects.filter(user__followed_by__user=request.user)
+    reviews = Review.objects.filter(user__followed_by__user=request.user)
     posts = sorted(
         chain(tickets, reviews),
         key=lambda post: post.time_created,
@@ -21,6 +21,21 @@ def home(request):
 #     ordering = '-time_created'
 #     template_name = 'flux/home.html'
 #     context_object_name = "tickets"
+
+@login_required
+def my_posts(request):
+    tickets = Ticket.objects.filter(user=request.user)
+    reviews = Review.objects.filter(user=request.user)
+    posts = sorted(
+        chain(tickets, reviews),
+        key=lambda post: post.time_created,
+        reverse=True)
+    context = {"posts" : posts}
+    return render(request, 'flux/my_posts.html', context)
+
+class TicketDeleteView(LoginRequiredMixin, DeleteView):
+    model = Ticket
+    success_url = '/home/'
 
 class TicketCreateView(LoginRequiredMixin, CreateView):
     model = Ticket
