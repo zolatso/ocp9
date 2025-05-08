@@ -10,12 +10,6 @@ class Ticket(models.Model):
         to=settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     image = models.ImageField(null=True, blank=True)
     time_created = models.DateTimeField(auto_now_add=True)
-    
-    def is_review(self):
-        return False
-        
-    def is_ticket(self):
-        return True
 
     class Meta:
         get_latest_by = 'time_created'
@@ -31,12 +25,6 @@ class Review(models.Model):
     user = models.ForeignKey(
         to=settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     time_created = models.DateTimeField(auto_now_add=True)
-
-    def is_review(self):
-        return True
-        
-    def is_ticket(self):
-        return False
 
 
 class UserFollows(models.Model):

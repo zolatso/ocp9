@@ -20,16 +20,21 @@
                 {% for follower in followers %}
                     <p>
                         {{ follower.user }} 
-                        <a class="btn btn-primary" href="{% url 'remove-follower' follower.user.id %}" role="button">Remove follower</a>
+                        <a class="btn btn-danger" href="{% url 'remove-follower' follower.user.id %}" role="button">Remove follower</a>
                     </p>
                 {% endfor %}
             </div>
             <div class="col">
                 <h3>Following:</h3>
                 {% for followed in following %}
-                    <p>
-                        {{ followed.followed_user }}
-                        <a class="btn btn-primary" href="{% url 'unfollow' followed.followed_user.id %}" role="button">Unfollow</a>
+                    <div class="row border">
+                        <div class="col">
+                            <p>{{ followed.followed_user }}</p>
+                        </div>
+                        <div class="col">
+                            <a class="btn btn-danger m-2" href="{% url 'unfollow' followed.followed_user.id %}" role="button">Unfollow</a>
+                        </div>
+                    </div>
                     </p>
                 {% endfor %}
             </div>

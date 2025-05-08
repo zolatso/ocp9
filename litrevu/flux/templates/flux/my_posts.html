@@ -11,7 +11,7 @@
         </div>
         {% for post in posts %}
         <div class="row border my-2 py-2">
-            {% if post.is_ticket %}
+            {% if post.content_type == 'TICKET' %}
                 <div class="col">
                     <h2>Ticket: {{ post.title }}</h2>
                     <p>{{ post.description}}</p>
@@ -28,7 +28,7 @@
                         <img src="{{ post.image.url }}" class="img-fluid">
                     {% endif %}
                 </div>
-            {% elif post.is_review %}
+            {% elif post.content_type == 'REVIEW' %}
                 <div class="col">
                     <h2>{{ post.headline }}</h2>
                     <p>{{ post.rating}}</p>

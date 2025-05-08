@@ -1,19 +1,27 @@
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
+from django.db.models import Value, CharField, Exists, OuterRef
 from django.views.generic import CreateView, DeleteView, UpdateView
-from django.shortcuts import render
 from django.shortcuts import render, redirect
 from .models import Ticket, Review, UserFollows
 from authenticate.models import User
 from itertools import chain
-from .forms import TicketReviewForm, FollowUserForm
+from .forms import TicketReviewForm, FollowUserForm, ReviewForm
 
 
 @login_required
 def home(request):
-    tickets = Ticket.objects.filter(user__followed_by__user=request.user)
-    reviews = Review.objects.filter(user__followed_by__user=request.user)
+    tickets = Ticket.objects.filter(user__followed_by__user=request.user).annotate(
+        content_type=Value('TICKET', CharField()),
+        has_review=Exists(
+            Review.objects.filter(ticket=OuterRef('pk'))
+            )
+        )
+    reviews = Review.objects.filter(
+        user__followed_by__user=request.user,
+        ticket__user=request.user).select_related('ticket').annotate(
+                content_type=Value('REVIEW', CharField()))
     posts = sorted(
         chain(tickets, reviews),
         key=lambda post: post.time_created,
@@ -23,8 +31,8 @@ def home(request):
 
 @login_required
 def my_posts(request):
-    tickets = Ticket.objects.filter(user=request.user)
-    reviews = Review.objects.filter(user=request.user)
+    tickets = Ticket.objects.filter(user=request.user).annotate(content_type=Value('TICKET', CharField()))
+    reviews = Review.objects.filter(user=request.user).annotate(content_type=Value('REVIEW', CharField()))
     posts = sorted(
         chain(tickets, reviews),
         key=lambda post: post.time_created,
@@ -92,10 +100,10 @@ class TicketUpdateView(LoginRequiredMixin, UpdateView):
     success_url = '/home/my_posts/'
     
 
-class ReviewCreateView(LoginRequiredMixin, CreateView):
+class ReviewCreateView(LoginRequiredMixin, CreateView, ReviewForm):
     model = Review
-    fields = ['rating', 'headline', 'body']
     success_url = '/home/'
+    form_class = ReviewForm
     
     def form_valid(self, form):
         # Set the user to the currently logged in user
@@ -111,9 +119,9 @@ class ReviewDeleteView(LoginRequiredMixin, DeleteView):
     success_url = '/home/my_posts/'
 
 
-class ReviewUpdateView(LoginRequiredMixin, UpdateView):
+class ReviewUpdateView(LoginRequiredMixin, UpdateView, ReviewForm):
     model = Review
-    fields = ['rating', 'headline', 'body']
+    form_class = ReviewForm
     success_url = '/home/my_posts/'
 
 
