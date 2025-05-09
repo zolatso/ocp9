@@ -1,7 +1,7 @@
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
-from django.db.models import Value, CharField, Exists, OuterRef
+from django.db.models import Value, CharField, Exists, OuterRef, Q
 from django.views.generic import CreateView, DeleteView, UpdateView
 from django.shortcuts import render, redirect
 from .models import Ticket, Review, UserFollows
@@ -12,16 +12,18 @@ from .forms import TicketReviewForm, FollowUserForm, ReviewForm
 
 @login_required
 def home(request):
-    tickets = Ticket.objects.filter(user__followed_by__user=request.user).annotate(
-        content_type=Value('TICKET', CharField()),
-        has_review=Exists(
-            Review.objects.filter(ticket=OuterRef('pk'))
+    followed_users = request.user.following.values_list('followed_user', flat=True)
+    tickets = Ticket.objects.filter(
+                Q(user=request.user) | Q(user__in=followed_users)
+            ).annotate(
+                content_type=Value('TICKET', CharField()),
+                has_review=Exists(Review.objects.filter(ticket=OuterRef('pk')))
             )
-        )
     reviews = Review.objects.filter(
-        user__followed_by__user=request.user,
-        ticket__user=request.user).select_related('ticket').annotate(
-                content_type=Value('REVIEW', CharField()))
+                Q(user=request.user) | Q(user__in=followed_users)
+            ).select_related('ticket').annotate(
+                content_type=Value('REVIEW', CharField())
+            )
     posts = sorted(
         chain(tickets, reviews),
         key=lambda post: post.time_created,
@@ -32,7 +34,9 @@ def home(request):
 @login_required
 def my_posts(request):
     tickets = Ticket.objects.filter(user=request.user).annotate(content_type=Value('TICKET', CharField()))
-    reviews = Review.objects.filter(user=request.user).annotate(content_type=Value('REVIEW', CharField()))
+    reviews = Review.objects.filter(user=request.user).select_related('ticket').annotate(
+        content_type=Value('REVIEW', CharField())
+        )
     posts = sorted(
         chain(tickets, reviews),
         key=lambda post: post.time_created,

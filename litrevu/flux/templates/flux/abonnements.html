@@ -18,16 +18,20 @@
             <div class="col">
                 <h3>Followers:</h3>
                 {% for follower in followers %}
-                    <p>
-                        {{ follower.user }} 
-                        <a class="btn btn-danger" href="{% url 'remove-follower' follower.user.id %}" role="button">Remove follower</a>
-                    </p>
+                    <div class="row border mx-2">
+                        <div class="col">
+                            <p>{{ follower.user }}</p>
+                        </div>
+                        <div class="col">
+                            <a class="btn btn-danger m-2" href="{% url 'remove-follower' follower.user.id %}" role="button">Remove follower</a>
+                        </div>
+                    </div>
                 {% endfor %}
             </div>
             <div class="col">
                 <h3>Following:</h3>
                 {% for followed in following %}
-                    <div class="row border">
+                    <div class="row border mx-2">
                         <div class="col">
                             <p>{{ followed.followed_user }}</p>
                         </div>

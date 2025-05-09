@@ -16,7 +16,11 @@
                     <h5 class="pb-3">{{ post.user }} a demandé une critique</h5>
                     <h3>{{ post.title }}</h2>
                     <p>{{ post.description}}</p>
-                    <a class="btn btn-primary" href="{% url "review-create" post.id %}" role="button">Créer une critique pour ce billet</a>
+                    {% if post.has_review %}
+                        <h5>Quelqu'un a déjà posté un commentaire pour ce billet</h5>
+                    {% else %}
+                        <a class="btn btn-primary" href="{% url "review-create" post.id %}" role="button">Créer une critique pour ce billet</a>
+                    {% endif %}
                 </div>
                 <div class="col">
                     <p class="text-end">{{ post.time_created }}</p>
