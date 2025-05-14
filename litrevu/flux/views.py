@@ -127,6 +127,13 @@ class ReviewCreateView(LoginRequiredMixin, CreateView, ReviewForm):
         ticket_id = self.kwargs["id"]
         form.instance.ticket = Ticket.objects.get(id=ticket_id)
         return super().form_valid(form)
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        ticket_id = self.kwargs["id"]
+        ticket = Ticket.objects.get(id=ticket_id)
+        context["ticket"] = ticket  # Add any info you want from the ticket
+        return context
 
 
 class ReviewDeleteView(LoginRequiredMixin, DeleteView):
@@ -138,6 +145,12 @@ class ReviewUpdateView(LoginRequiredMixin, UpdateView, ReviewForm):
     model = Review
     form_class = ReviewForm
     success_url = "/home/my_posts/"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        review = self.object
+        context["ticket"] = review.ticket  # Add any info you want from the ticket
+        return context
 
 
 @login_required

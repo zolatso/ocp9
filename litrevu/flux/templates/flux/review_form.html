@@ -2,9 +2,27 @@
 {% load django_bootstrap5 %}
 
 {% block content %}
-    <form method="post">
-        {% csrf_token %}
-        {% bootstrap_form form %}
-        <button type="submit" class="btn btn-primary">Submit</button>
-    </form>
+    <div class="container">
+        <div class="row border">
+            <div class="col">
+                <p><strong>Vous êtes en train de poster une critique en réponse à: </strong></p>
+                <p>{{ ticket.title }}</p>
+                <p><strong>Qui a été laisse par: </strong></p>
+                <p>{{ ticket.user }}</p>
+                <p>Qui a dit: "{{ ticket.description }}"<p>
+            </div>
+            <div class="col">
+                {% if ticket.image %}
+                    <img src="{{ ticket.image.url }}" class="img-fluid" alt="Image of ticket: {{ ticket.title }}">
+                {% endif %}
+            </div>
+        </div>
+        <div class="row">
+            <form method="post">
+                {% csrf_token %}
+                {% bootstrap_form form %}
+                <button type="submit" class="btn btn-primary">Submit</button>
+            </form>
+        </div>
+    </div>
 {% endblock %}

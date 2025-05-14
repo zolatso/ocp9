@@ -25,20 +25,22 @@
                 <div class="col">
                     <p class="text-end">{{ post.time_created }}</p>
                     {% if post.image %}
-                        <img src="{{ post.image.url }}" class="img-fluid">
+                        <img src="{{ post.image.url }}" class="img-fluid" alt="Image of ticket: {{ post.title }}">
                     {% endif %}
                 </div>
             {% elif post.content_type == 'REVIEW' %}
                 <div class="col">
                     <h5 class="pb-3">{{ post.user }} a laissé une critique</h5>
                     <h3>{{ post.headline }}</h3>
-                    {% for i in '12345' %}
-                    {% if forloop.counter <= post.rating %}
-                        <i class="bi bi-star-fill text-warning"></i>
-                    {% else %}
-                        <i class="bi bi-star text-warning"></i>
-                    {% endif %}
-                    {% endfor %}
+                    <span aria-label="{{ post.rating }} out of 5 stars">
+                        {% for i in '12345' %}
+                        {% if forloop.counter <= post.rating %}
+                            <i class="bi bi-star-fill text-warning" aria-hidden="true"></i>
+                        {% else %}
+                            <i class="bi bi-star text-warning" aria-hidden="true"></i>
+                        {% endif %}
+                        {% endfor %}
+                    </span>
                     <p class="pt-3">{{ post.body }}</p>
                 </div>
                 <div class="col">
@@ -47,7 +49,7 @@
                         <p>Ticket - {{ post.ticket.user }}</p>
                         <h5>{{ post.ticket.title }}</h5>
                         {% if post.ticket.image %}
-                            <img src="{{ post.ticket.image.url }}" class="img-fluid">
+                        <img src="{{ post.ticket.image.url }}" class="img-fluid" alt="Image of ticket: {{ post.ticket.title }}">
                         {% endif %}
                     </div>
                 </div>

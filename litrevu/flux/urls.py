@@ -20,7 +20,7 @@ urlpatterns = [
     path("ticket/update/<pk>", TicketUpdateView.as_view(), name="ticket-update"),
     path("review/create/<int:id>/", ReviewCreateView.as_view(), name="review-create"),
     path("review/delete/<pk>", ReviewDeleteView.as_view(), name="review-delete"),
-    path("review/update/<pk>", ReviewUpdateView.as_view(), name="review-update"),
+    path("review/update/<pk>/", ReviewUpdateView.as_view(), name="review-update"),
     path("ticket-review/create/", ticket_review_create, name="ticket-review-create"),
     path("abonnements/", abonnements, name="abonnements"),
     path(
