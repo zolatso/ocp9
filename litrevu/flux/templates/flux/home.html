@@ -48,6 +48,7 @@
                     <div class="border">
                         <p>Ticket - {{ post.ticket.user }}</p>
                         <h5>{{ post.ticket.title }}</h5>
+                        <p>{{ post.ticket.description }}</p>
                         {% if post.ticket.image %}
                         <img src="{{ post.ticket.image.url }}" class="img-fluid" alt="Image of ticket: {{ post.ticket.title }}">
                         {% endif %}
